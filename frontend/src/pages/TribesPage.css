@@ -1,0 +1,59 @@
+.tribes-page__status {
+  margin-bottom: 1rem;
+}
+
+.tribes-filters {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.tribes-filters__input,
+.tribes-filters__select {
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font: inherit;
+  background: #fff;
+}
+
+.tribes-filters__input {
+  min-width: 260px;
+}
+
+.tribes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.tribe-card {
+  padding: 1.25rem;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.tribe-card__title {
+  margin-bottom: 1rem;
+}
+
+.tribe-card__details {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.tribe-card__details p {
+  margin: 0;
+}
+
+.tribe-card__details span {
+  font-weight: 700;
+}
+
+.tribe-card__description {
+  margin-top: 1rem;
+  line-height: 1.5;
+}

@@ -1,0 +1,89 @@
+.manage-page__message {
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.manage-page__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.manage-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1.25rem;
+  border: 1px solid #ddd;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.manage-form input,
+.manage-form textarea,
+.manage-form select {
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font: inherit;
+}
+
+.manage-form textarea {
+  min-height: 100px;
+  flex: 1;
+  resize: vertical;
+}
+
+.manage-form button {
+  width: 170px;
+  height: 48px;
+  margin-top: auto;
+  padding: 0.8rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  background: #4b2e83;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.manage-page__delete-section {
+  margin-top: 2rem;
+}
+
+.manage-page__delete-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.manage-records {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.manage-record {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.manage-record span {
+  overflow-wrap: anywhere;
+}
+
+.manage-record button {
+  flex: 0 0 auto;
+  padding: 0.55rem 0.85rem;
+  border: none;
+  border-radius: 8px;
+  background: #8f1d2c;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}

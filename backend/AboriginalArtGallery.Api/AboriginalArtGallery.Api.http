@@ -1,0 +1,6 @@
+@AboriginalArtGallery.Api_HostAddress = http://localhost:5141
+
+GET {{AboriginalArtGallery.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
