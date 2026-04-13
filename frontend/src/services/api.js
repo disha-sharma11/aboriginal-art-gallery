@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5141/api';
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5141/api';
 
 export async function getArtifacts() {
   const response = await fetch(`${BASE_URL}/Artifacts`);
