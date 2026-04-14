@@ -8,12 +8,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Build Backend') {
             steps {
                 dir('backend') {
@@ -147,10 +141,16 @@ pipeline {
             archiveArtifacts artifacts: 'security-dotnet.txt,security-npm.json,monitoring-check.txt', fingerprint: true
         }
         success {
-            echo 'All pipeline stages passed, including staging deployment, production release, and monitoring checks.'
+            echo 'All 7 pipeline stages passed, including staging deployment, production release, and monitoring checks.'
+            mail to: 'itsdisha6@gmail.com',
+                 subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: "Pipeline succeeded.\nJob: ${env.JOB_NAME}\nBuild: ${env.BUILD_NUMBER}\nURL: ${env.BUILD_URL}"
         }
         failure {
             echo 'Pipeline failed. Check the stage logs.'
+            mail to: 'itsdisha6@gmail.com',
+                 subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: "Pipeline failed.\nJob: ${env.JOB_NAME}\nBuild: ${env.BUILD_NUMBER}\nURL: ${env.BUILD_URL}"
         }
     }
 }
