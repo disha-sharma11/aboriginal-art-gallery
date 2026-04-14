@@ -47,6 +47,17 @@ pipeline {
                 }
             }
         }
+        
+        stage('Code Quality') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                        sonar-scanner
+                    '''
+                }
+            }
+        }
+
     }
 
     post {
