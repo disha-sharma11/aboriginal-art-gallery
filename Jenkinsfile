@@ -5,6 +5,7 @@ pipeline {
         DOTNET_CLI_TELEMETRY_OPTOUT = '1'
         ASPNETCORE_ENVIRONMENT = 'Development'
         REACT_APP_API_BASE_URL = 'http://localhost:5141/api'
+        IMAGE_TAG = "build-${BUILD_NUMBER}"
     }
 
     stages {
@@ -13,6 +14,8 @@ pipeline {
                 dir('backend') {
                     sh 'dotnet restore AboriginalArtGallery.slnx'
                     sh 'dotnet build AboriginalArtGallery.slnx --no-restore'
+                    sh 'mkdir -p ../artifacts/backend'
+                    sh 'dotnet publish AboriginalArtGallery.Api/AboriginalArtGallery.Api.csproj -c Release --no-build -o ../artifacts/backend'
                 }
             }
         }
@@ -22,6 +25,7 @@ pipeline {
                 dir('frontend') {
                     sh 'npm ci'
                     sh 'npm run build'
+                    sh 'mkdir -p ../artifacts/frontend && cp -R build/. ../artifacts/frontend/'
                 }
             }
         }
@@ -29,7 +33,8 @@ pipeline {
         stage('Test Backend') {
             steps {
                 dir('backend') {
-                    sh 'dotnet test AboriginalArtGallery.slnx --no-build'
+                    sh 'mkdir -p ../artifacts/test-results/backend'
+                    sh 'dotnet test AboriginalArtGallery.slnx --no-build --logger "trx;LogFileName=backend-tests.trx" --results-directory ../artifacts/test-results/backend'
                 }
             }
         }
@@ -37,20 +42,30 @@ pipeline {
         stage('Test Frontend') {
             steps {
                 dir('frontend') {
-                    sh 'CI=true npm test -- --watchAll=false'
+                    sh 'CI=true npm test -- --watchAll=false --coverage'
                 }
             }
         }
         
         stage('Code Quality') {
             steps {
-                script 
-                {
-                    def scannerHome = tool 'SonarScanner'
-                    withSonarQubeEnv('SonarCloud') 
-                    {
-                        sh "${scannerHome}/bin/sonar-scanner"
-                    }
+                withSonarQubeEnv('SonarCloud') {
+                    sh '''
+                        dotnet tool update --global dotnet-sonarscanner || dotnet tool install --global dotnet-sonarscanner
+                        export PATH="$PATH:$HOME/.dotnet/tools"
+
+                        dotnet sonarscanner begin \
+                          /k:"disha-sharma11_aboriginal-art-gallery" \
+                          /o:"disha-sharma11" \
+                          /d:sonar.host.url="$SONAR_HOST_URL" \
+                          /d:sonar.token="$SONAR_AUTH_TOKEN" \
+                          /d:sonar.javascript.lcov.reportPaths="frontend/coverage/lcov.info" \
+                          /d:sonar.cs.vstest.reportsPaths="artifacts/test-results/backend/*.trx"
+
+                        dotnet build backend/AboriginalArtGallery.slnx --no-restore
+
+                        dotnet sonarscanner end /d:sonar.token="$SONAR_AUTH_TOKEN"
+                    '''
                 }
             }
         }
@@ -122,14 +137,31 @@ pipeline {
         stage('Monitoring Check') {
             steps {
                 sh '''
+                    check_endpoint() {
+                      local environment_name="$1"
+                      local url="$2"
+                      local response
+
+                      response=$(curl --silent --show-error --fail \
+                        --write-out "http_code=%{http_code} time_total=%{time_total}" \
+                        "$url")
+
+                      {
+                        echo "[$(date -u +"%Y-%m-%dT%H:%M:%SZ")] ${environment_name}"
+                        echo "${response}"
+                        echo
+                      } >> monitoring-check.txt
+                    }
+
+                    : > monitoring-check.txt
                     {
-                      echo "Staging health:"
-                      curl --fail --silent http://localhost:5142/health
+                      echo "Build tag: ${IMAGE_TAG}"
+                      echo "Build URL: ${BUILD_URL}"
                       echo
-                      echo "Production health:"
-                      curl --fail --silent http://localhost:5143/health
-                      echo
-                    } > monitoring-check.txt
+                    } >> monitoring-check.txt
+
+                    check_endpoint "Staging health" "http://localhost:5142/health"
+                    check_endpoint "Production health" "http://localhost:5143/health"
                 '''
             }
         }
@@ -138,7 +170,7 @@ pipeline {
     post {
         always {
             echo 'Pipeline finished.'
-            archiveArtifacts artifacts: 'security-dotnet.txt,security-npm.json,monitoring-check.txt', fingerprint: true
+            archiveArtifacts artifacts: 'artifacts/**/*,frontend/coverage/lcov.info,security-dotnet.txt,security-npm.json,monitoring-check.txt', fingerprint: true
         }
         success {
             echo 'All 7 pipeline stages passed, including staging deployment, production release, and monitoring checks.'

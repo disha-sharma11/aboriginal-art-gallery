@@ -2,13 +2,17 @@ import { MemoryRouter } from 'react-router-dom';
 import { render, screen, within } from '@testing-library/react';
 import HomePage from './pages/HomePage';
 
+function renderHomePage() {
+  render(
+    <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <HomePage />
+    </MemoryRouter>
+  );
+}
+
 describe('HomePage', () => {
   test('renders the page heading and description', () => {
-    render(
-      <MemoryRouter>
-        <HomePage />
-      </MemoryRouter>
-    );
+    renderHomePage();
 
     expect(
       screen.getByRole('heading', { level: 1, name: 'Aboriginal Art Gallery' })
@@ -22,11 +26,7 @@ describe('HomePage', () => {
   });
 
   test('renders the homepage feature cards', () => {
-    render(
-      <MemoryRouter>
-        <HomePage />
-      </MemoryRouter>
-    );
+    renderHomePage();
 
     const artifactsCard = screen.getByRole('link', {
       name: /Artifacts Browse Aboriginal artworks and explore their details\./i,
@@ -48,5 +48,14 @@ describe('HomePage', () => {
     expect(artistsCard).toBeInTheDocument();
     expect(tribesCard).toBeInTheDocument();
     expect(commentsCard).toBeInTheDocument();
+  });
+
+  test('shows all four navigation cards inside the homepage grid', () => {
+    renderHomePage();
+
+    const grid = screen.getByRole('heading', { level: 2, name: 'Artifacts' }).closest('div');
+    const links = within(grid).getAllByRole('link');
+
+    expect(links).toHaveLength(4);
   });
 });
