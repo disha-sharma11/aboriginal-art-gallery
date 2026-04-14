@@ -51,6 +51,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarCloud') {
                     sh '''
+                        rm -rf .scannerwork .sonarqube
                         dotnet tool update --global dotnet-sonarscanner || dotnet tool install --global dotnet-sonarscanner
                         export PATH="$PATH:$HOME/.dotnet/tools"
 
@@ -63,7 +64,7 @@ pipeline {
                             /d:sonar.exclusions="**/bin/**,**/obj/**,**/node_modules/**,frontend/build/**,backend/AboriginalArtGallery.Api/Migrations/**,artifacts/**,security-npm.json,security-dotnet.txt,monitoring-check.txt" \
                             /d:sonar.javascript.lcov.reportPaths="frontend/coverage/lcov.info" \
                             /d:sonar.cs.vstest.reportsPaths="artifacts/test-results/backend/*.trx"
-                        
+
                         dotnet build backend/AboriginalArtGallery.slnx --no-restore -c Release
 
                         dotnet sonarscanner end /d:sonar.token="$SONAR_AUTH_TOKEN"
