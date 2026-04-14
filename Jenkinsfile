@@ -60,14 +60,6 @@ pipeline {
                 }
             }
         }
-        
-        // stage('Quality Gate') {
-        //     steps {
-        //         timeout(time: 10, unit: 'MINUTES') {
-        //             waitForQualityGate abortPipeline: true
-        //         }
-        //     }
-        // }
 
         stage('Security') {
             steps {
@@ -77,6 +69,19 @@ pipeline {
                 dir('frontend') {
                     sh 'npm audit --audit-level=high --json > ../security-npm.json || true'
                 }
+            }
+        }
+
+        stage('Deploy Staging') {
+            steps {
+                sh 'docker compose -f docker-compose.staging.yml down || true'
+                sh 'docker compose -f docker-compose.staging.yml up --build -d'
+            }
+        }
+
+        stage('Smoke Test Staging') {
+            steps {
+                sh 'curl --fail http://localhost:5142/health'
             }
         }
 
@@ -90,7 +95,7 @@ pipeline {
 
         }
         success {
-            echo 'Build, test, and code quality stages passed.'
+            echo 'Build, test, code quality, security, and staging deployment stages passed.'
         }
         failure {
             echo 'Pipeline failed. Check the stage logs.'
