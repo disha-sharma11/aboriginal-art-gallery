@@ -68,6 +68,18 @@ pipeline {
         //         }
         //     }
         // }
+
+        stage('Security') {
+            steps {
+                dir('backend') {
+                    sh 'dotnet list AboriginalArtGallery.slnx package --vulnerable --include-transitive || true'
+                }
+                dir('frontend') {
+                    sh 'npm audit --audit-level=high || true'
+                }
+            }
+        }
+
     }
 
     post {
@@ -75,7 +87,7 @@ pipeline {
             echo 'Pipeline finished.'
         }
         success {
-            echo 'Build and test stages passed.'
+            echo 'Build, test, and code quality stages passed.'
         }
         failure {
             echo 'Pipeline failed. Check the stage logs.'
