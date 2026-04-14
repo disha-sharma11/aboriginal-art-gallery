@@ -13,7 +13,7 @@ pipeline {
             steps {
                 dir('backend') {
                     sh 'dotnet restore AboriginalArtGallery.slnx'
-                    sh 'dotnet build AboriginalArtGallery.slnx --no-restore'
+                    sh 'dotnet build AboriginalArtGallery.slnx --no-restore -c Release'
                     sh 'mkdir -p ../artifacts/backend'
                     sh 'dotnet publish AboriginalArtGallery.Api/AboriginalArtGallery.Api.csproj -c Release --no-build -o ../artifacts/backend'
                 }
