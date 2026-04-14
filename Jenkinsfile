@@ -74,16 +74,28 @@ pipeline {
 
         stage('Deploy Staging') {
             steps {
-                sh 'docker compose -f docker-compose.staging.yml down || true'
-                sh 'docker compose -f docker-compose.staging.yml up --build -d'
+                sh 'docker compose -p aboriginal-art-gallery-staging -f docker-compose.staging.yml down || true'
+                sh 'docker compose -p aboriginal-art-gallery-staging -f docker-compose.staging.yml up --build -d'
+
             }
         }
 
         stage('Smoke Test Staging') {
             steps {
-                sh 'curl --fail http://localhost:5142/health'
+                sh '''
+                    for i in {1..12}; do
+                      if curl --fail --silent http://localhost:5142/health; then
+                        exit 0
+                      fi
+                      echo "Waiting for staging health endpoint..."
+                      sleep 5
+                    done
+                    echo "Staging health check failed."
+                    exit 1
+                '''
             }
         }
+
 
 
     }
