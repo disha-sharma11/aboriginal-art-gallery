@@ -59,9 +59,6 @@ pipeline {
                             /o:"disha-sharma11" \
                             /d:sonar.host.url="$SONAR_HOST_URL" \
                             /d:sonar.token="$SONAR_AUTH_TOKEN" \
-                            /d:sonar.projectBaseDir="." \
-                            /d:sonar.sources="backend/AboriginalArtGallery.Api,frontend/src" \
-                            /d:sonar.tests="backend/AboriginalArtGallery.Api.Tests,frontend/src" \
                             /d:sonar.test.inclusions="backend/AboriginalArtGallery.Api.Tests/**/*.cs,frontend/src/**/*.test.js" \
                             /d:sonar.exclusions="**/bin/**,**/obj/**,**/node_modules/**,frontend/build/**,backend/AboriginalArtGallery.Api/Migrations/**" \
                             /d:sonar.javascript.lcov.reportPaths="frontend/coverage/lcov.info" \
