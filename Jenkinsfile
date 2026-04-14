@@ -34,7 +34,7 @@ pipeline {
             steps {
                 dir('backend') {
                     sh 'mkdir -p ../artifacts/test-results/backend'
-                    sh 'dotnet test AboriginalArtGallery.slnx --no-build --logger "trx;LogFileName=backend-tests.trx" --results-directory ../artifacts/test-results/backend'
+                    sh 'dotnet test AboriginalArtGallery.slnx --no-build -c Release --logger "trx;LogFileName=backend-tests.trx" --results-directory ../artifacts/test-results/backend'
                 }
             }
         }
@@ -55,13 +55,18 @@ pipeline {
                         export PATH="$PATH:$HOME/.dotnet/tools"
 
                         dotnet sonarscanner begin \
-                          /k:"disha-sharma11_aboriginal-art-gallery" \
-                          /o:"disha-sharma11" \
-                          /d:sonar.host.url="$SONAR_HOST_URL" \
-                          /d:sonar.token="$SONAR_AUTH_TOKEN" \
-                          /d:sonar.javascript.lcov.reportPaths="frontend/coverage/lcov.info" \
-                          /d:sonar.cs.vstest.reportsPaths="artifacts/test-results/backend/*.trx"
-
+                            /k:"disha-sharma11_aboriginal-art-gallery" \
+                            /o:"disha-sharma11" \
+                            /d:sonar.host.url="$SONAR_HOST_URL" \
+                            /d:sonar.token="$SONAR_AUTH_TOKEN" \
+                            /d:sonar.projectBaseDir="." \
+                            /d:sonar.sources="backend/AboriginalArtGallery.Api,frontend/src" \
+                            /d:sonar.tests="backend/AboriginalArtGallery.Api.Tests,frontend/src" \
+                            /d:sonar.test.inclusions="backend/AboriginalArtGallery.Api.Tests/**/*.cs,frontend/src/**/*.test.js" \
+                            /d:sonar.exclusions="**/bin/**,**/obj/**,**/node_modules/**,frontend/build/**,backend/AboriginalArtGallery.Api/Migrations/**" \
+                            /d:sonar.javascript.lcov.reportPaths="frontend/coverage/lcov.info" \
+                            /d:sonar.cs.vstest.reportsPaths="artifacts/test-results/backend/*.trx"
+                        
                         dotnet build backend/AboriginalArtGallery.slnx --no-restore
 
                         dotnet sonarscanner end /d:sonar.token="$SONAR_AUTH_TOKEN"
