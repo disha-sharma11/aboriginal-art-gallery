@@ -96,6 +96,34 @@ pipeline {
             }
         }
 
+        stage('Approve Production Release') {
+            steps {
+                input message: 'Deploy this build to production?', ok: 'Release'
+            }
+        }
+
+        stage('Release Production') {
+            steps {
+                sh 'docker compose -p aboriginal-art-gallery-production -f docker-compose.prod.yml down || true'
+                sh 'docker compose -p aboriginal-art-gallery-production -f docker-compose.prod.yml up --build -d'
+            }
+        }
+
+        stage('Smoke Test Production') {
+            steps {
+                sh '''
+                    for i in {1..12}; do
+                      if curl --fail --silent http://localhost:5143/health; then
+                        exit 0
+                      fi
+                      echo "Waiting for production health endpoint..."
+                      sleep 5
+                    done
+                    echo "Production health check failed."
+                    exit 1
+                '''
+            }
+        }
 
 
     }
@@ -107,7 +135,7 @@ pipeline {
 
         }
         success {
-            echo 'Build, test, code quality, security, and staging deployment stages passed.'
+            echo 'Build, test, code quality, security, staging deployment, and production release stages passed.'
         }
         failure {
             echo 'Pipeline failed. Check the stage logs.'
