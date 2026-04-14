@@ -1,7 +1,6 @@
 services:
   db:
     image: postgis/postgis:16-3.4
-    container_name: aboriginal-art-gallery-db-staging
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-aboriginal_art_gallery_staging}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -15,7 +14,6 @@ services:
     build:
       context: ./backend
       dockerfile: AboriginalArtGallery.Api/Dockerfile
-    container_name: aboriginal-art-gallery-api-staging
     environment:
       ASPNETCORE_ENVIRONMENT: Staging
       ConnectionStrings__DefaultConnection: Host=db;Port=5432;Database=${POSTGRES_DB:-aboriginal_art_gallery_staging};Username=${POSTGRES_USER:-postgres};Password=${POSTGRES_PASSWORD:-postgres}
@@ -28,7 +26,6 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: aboriginal-art-gallery-frontend-staging
     ports:
       - "3001:80"
     depends_on:
