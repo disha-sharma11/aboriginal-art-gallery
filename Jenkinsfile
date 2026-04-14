@@ -125,17 +125,29 @@ pipeline {
             }
         }
 
-
+        stage('Monitoring Check') {
+            steps {
+                sh '''
+                    {
+                      echo "Staging health:"
+                      curl --fail --silent http://localhost:5142/health
+                      echo
+                      echo "Production health:"
+                      curl --fail --silent http://localhost:5143/health
+                      echo
+                    } > monitoring-check.txt
+                '''
+            }
+        }
     }
 
     post {
         always {
             echo 'Pipeline finished.'
-            archiveArtifacts artifacts: 'security-dotnet.txt,security-npm.json', fingerprint: true
-
+            archiveArtifacts artifacts: 'security-dotnet.txt,security-npm.json,monitoring-check.txt', fingerprint: true
         }
         success {
-            echo 'Build, test, code quality, security, staging deployment, and production release stages passed.'
+            echo 'All pipeline stages passed, including staging deployment, production release, and monitoring checks.'
         }
         failure {
             echo 'Pipeline failed. Check the stage logs.'
