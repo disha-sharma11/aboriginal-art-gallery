@@ -5,8 +5,6 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-aboriginal_art_gallery_staging}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-    ports:
-      - "5433:5432"
     volumes:
       - postgres_data_staging:/var/lib/postgresql/data
 
