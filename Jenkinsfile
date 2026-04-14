@@ -72,19 +72,22 @@ pipeline {
         stage('Security') {
             steps {
                 dir('backend') {
-                    sh 'dotnet list AboriginalArtGallery.slnx package --vulnerable --include-transitive || true'
+                    sh 'dotnet list AboriginalArtGallery.slnx package --vulnerable --include-transitive > ../security-dotnet.txt || true'
                 }
                 dir('frontend') {
-                    sh 'npm audit --audit-level=high || true'
+                    sh 'npm audit --audit-level=high --json > ../security-npm.json || true'
                 }
             }
         }
+
 
     }
 
     post {
         always {
             echo 'Pipeline finished.'
+            archiveArtifacts artifacts: 'security-dotnet.txt,security-npm.json', fingerprint: true
+
         }
         success {
             echo 'Build, test, and code quality stages passed.'
